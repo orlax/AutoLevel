@@ -1,0 +1,45 @@
+###############################################################################
+# Unity-package (UPM) repo – keep only the files that make up the package     #
+# Adapted from the official Unity template¹ but trimmed for a package-only    #
+# workflow.  Commit:                                                          #
+#   • package.json, CHANGELOG.md, README.md, LICENSE                          #
+#   • Runtime/, Editor/, Tests/, Documentation~, Samples~/… (source assets)   #
+#   • .asmdef, .meta (except inside Samples~), images, etc.                   #
+###############################################################################
+
+#––– Unity project artefacts (created if you open the repo as a test project)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+syslog.txt
+
+#––– Auto-generated solution / IDE files
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# Rider / JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+#––– OS/Junk
+.DS_Store
+Thumbs.db
+
+#––– Imported samples (when you test-import your own package)
+Assets/Samples/
+
+#––– Samples~: Unity won’t track .meta files here², so ignore them explicitly
+Samples~/**/*.meta

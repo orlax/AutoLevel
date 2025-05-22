@@ -1,0 +1,30 @@
+{
+  "name": "com.orla.games.autolevel",
+  "version": "0.1.0",
+  "displayName": "Auto Level",
+  "description": "A tool for automatic level generation in Unity, turn basic Probuilder meshes into decorated levels",
+  "unity": "2022.3",
+  "documentationUrl": "https://ejemplo.com/midocumentacion",
+  "changelogUrl": "https://ejemplo.com/changelog.html",
+  "licensesUrl": "https://ejemplo.com/licencia.html",
+  "dependencies": {
+    "com.unity.probuilder": "5.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Auto Level Sample",
+      "description": "A sample scene demonstrating the use of Auto Level.",
+      "path": "Samples~/"
+    }
+  ],
+  "keywords": [
+    "level design",
+    "tool",
+    "prefab placement"
+  ],
+  "author": {
+    "name": "Orlando Almario",
+    "url": "https://orla.games"
+  },
+  "license": "LGPL-3.0-or-later"
+}

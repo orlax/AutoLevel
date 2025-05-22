@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03474d593581b4bf4869f38ff091d409, type: 3}
+  m_Name: example_prefabPack
+  m_EditorClassIdentifier: 
+  FloorHeight: 0
+  LinePrefabs:
+  - name: empty
+    prefab: {fileID: 0}
+    alignment: 0
+    sidePrefabIndex: 0
+    width: 0
+    offsetRotation: {x: 0, y: 0, z: 0}
+  - name: wall
+    prefab: {fileID: 1917148795198136466, guid: 94161b1a463bb45b68cb70f302a9e733, type: 3}
+    alignment: 0
+    sidePrefabIndex: 0
+    width: 3
+    offsetRotation: {x: 0, y: 90, z: 0}
+  - name: window
+    prefab: {fileID: 8395379208414790849, guid: dfa1a9e411da048c6b2071cc0fbb84be, type: 3}
+    alignment: 2
+    sidePrefabIndex: 1
+    width: 3
+    offsetRotation: {x: 0, y: 90, z: 0}
+  - name: windows
+    prefab: {fileID: 8395379208414790849, guid: dfa1a9e411da048c6b2071cc0fbb84be, type: 3}
+    alignment: 1
+    sidePrefabIndex: 1
+    width: 3
+    offsetRotation: {x: 0, y: 0, z: 0}
+  - name: window_double
+    prefab: {fileID: 2053411108710323110, guid: 26d9452df65b14b4cb4c4964c58e379b, type: 3}
+    alignment: 2
+    sidePrefabIndex: 1
+    width: 3
+    offsetRotation: {x: 0, y: 90, z: 0}
+  - name: door
+    prefab: {fileID: 8933781260074602234, guid: bfa298914bcf8468c8a3b710fd8c1b35, type: 3}
+    alignment: 2
+    sidePrefabIndex: 1
+    width: 3
+    offsetRotation: {x: 0, y: 90, z: 0}
+  PointPrefabs:
+  - name: empty
+    prefab: {fileID: 0}
+  - name: corner
+    prefab: {fileID: 2419589922998329761, guid: 436c55dcd0a7f49cfb73557dc8a7113d, type: 3}
