@@ -1,4 +1,7 @@
-# auto-level
+# Auto Level
+
+[![AutoLevel demo](https://img.youtube.com/vi/Uy8oB2Jq63g/hqdefault.jpg)](https://www.youtube.com/watch?v=Uy8oB2Jq63g)
+
 
 This is a tool intended to turn flat 3d meshes into 3d Maps that are heavily customizable
 
