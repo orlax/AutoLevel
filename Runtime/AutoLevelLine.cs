@@ -143,7 +143,14 @@ public class AutoLevelLine : MonoBehaviour{
         GameObject newObject = PrefabUtility.InstantiatePrefab(linePrefab.prefab) as GameObject;
         newObject.transform.position = center;
         newObject.transform.rotation = Quaternion.LookRotation(direction);
-        newObject.transform.localScale = new Vector3(newObject.transform.localScale.x, newObject.transform.localScale.y, distance/linePrefab.width);
+        
+        //apply the offset rotation
+        newObject.transform.Rotate(linePrefab.offsetRotation, Space.Self);
+
+        //calculate the scale to cover the distance of the line
+        var distance_ = Vector3.Distance(startPos, endPos);
+        newObject.transform.localScale = new Vector3(distance_/linePrefab.width, newObject.transform.localScale.y, newObject.transform.localScale.z);
+
         newObject.transform.SetParent(transform);
         
         #endif    
@@ -156,6 +163,7 @@ public class AutoLevelLine : MonoBehaviour{
         GameObject objectAtCenter = PrefabUtility.InstantiatePrefab(linePrefab.prefab) as GameObject;
         objectAtCenter.transform.position = center;
         objectAtCenter.transform.rotation = Quaternion.LookRotation(direction);        
+        objectAtCenter.transform.Rotate(linePrefab.offsetRotation, Space.Self); // Apply the offset rotation
         objectAtCenter.transform.SetParent(transform);
 
         //if the istantiated object implements this interface we want to get the level builder info it might need.
@@ -164,15 +172,45 @@ public class AutoLevelLine : MonoBehaviour{
             levelBuilderInfoGetter.GetLevelBuilderInfo(info, this);
         }
 
-        //we are not always creating a door but well.
-        var doorWidth = linePrefab.width;
-        //next we want to create two walls
-        //one from the start position to the center - the width/2
-        CreateAndStretch(prefabs.LinePrefabs[linePrefab.sidePrefabIndex], startPos, center - (transform.forward * doorWidth/2));
-        //one from the center position to the end position - the width/2
-        CreateAndStretch(prefabs.LinePrefabs[linePrefab.sidePrefabIndex], center + (transform.forward * doorWidth/2), endPos);
-       
+        // Check if the line is short enough to just stretch the center prefab
+        // We use a small tolerance (1.1f, meaning 110%) to avoid tiny side pieces.
+        if (distance < linePrefab.width * 1.1f) 
+        {
+            // Stretch the center object to fill the entire line.
+            // Consistent with your existing GenerateStretch and CreateAndStretch,
+            // this scales the local X-axis of the prefab.
+            if (linePrefab.width > 0) // Avoid division by zero
+            {
+                objectAtCenter.transform.localScale = new Vector3(distance / linePrefab.width, objectAtCenter.transform.localScale.y, objectAtCenter.transform.localScale.z);
+            }
+            else
+            {
+                // Default scale if linePrefab.width is zero or invalid, or you might want to log a warning.
+                objectAtCenter.transform.localScale = new Vector3(1, objectAtCenter.transform.localScale.y, objectAtCenter.transform.localScale.z);
+            }
+            // No side prefabs are created in this case.
+        }
+        else
+        {
+            // Original logic: Center object keeps its defined width (or rather, its imported scale, as it's not scaled here by default),
+            // and sides are generated. linePrefab.width is used to determine the space it occupies.
+            var occupiedWidth = linePrefab.width; 
 
+            // Check if the sidePrefabIndex is valid and points to an actual prefab to avoid errors.
+            if (linePrefab.sidePrefabIndex >= 0 && linePrefab.sidePrefabIndex < prefabs.LinePrefabs.Count && prefabs.LinePrefabs[linePrefab.sidePrefabIndex].prefab != null)
+            {
+                //one from the start position to the center - the occupiedWidth/2
+                CreateAndStretch(prefabs.LinePrefabs[linePrefab.sidePrefabIndex], startPos, center - (transform.forward * occupiedWidth/2));
+
+                //one from the center position to the end position - the occupiedWidth/2
+                CreateAndStretch(prefabs.LinePrefabs[linePrefab.sidePrefabIndex], center + (transform.forward * occupiedWidth/2), endPos);
+            }
+            else
+            {
+                // Optionally log a warning if side prefabs are expected but not configured correctly.
+                // Debug.LogWarning($"AutoLevelLine: Side prefab for {linePrefab.name} is not configured correctly or is missing.");
+            }
+        }
         #endif
     }
 
@@ -197,6 +235,9 @@ public class AutoLevelLine : MonoBehaviour{
             window.transform.position = windowPosition;
             window.transform.rotation = Quaternion.LookRotation(direction);
 
+            //apply the offset rotation
+            window.transform.Rotate(linePrefab.offsetRotation, Space.Self);
+
             window.transform.SetParent(transform);
             window.transform.localScale = new Vector3(window.transform.localScale.x, window.transform.localScale.y, window.transform.localScale.z+offset);
             window.transform.Rotate(rotationOffset, Space.Self);
@@ -220,9 +261,14 @@ public class AutoLevelLine : MonoBehaviour{
 
         GameObject newObject = PrefabUtility.InstantiatePrefab(linePrefab.prefab) as GameObject;
         newObject.transform.position = center_;
+
         newObject.transform.rotation = Quaternion.LookRotation(direction);
 
-        newObject.transform.localScale = new Vector3(newObject.transform.localScale.x, newObject.transform.localScale.y, distance_/linePrefab.width);
+        //apply the offset rotation
+        newObject.transform.Rotate(linePrefab.offsetRotation, Space.Self);
+
+        newObject.transform.localScale = new Vector3(distance_/linePrefab.width, newObject.transform.localScale.y, newObject.transform.localScale.z);
+
         newObject.transform.SetParent(transform);
         
         #endif

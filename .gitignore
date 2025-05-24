@@ -43,3 +43,6 @@ Assets/Samples/
 
 #––– Samples~: Unity won’t track .meta files here², so ignore them explicitly
 Samples~/**/*.meta
+docs.meta
+docs/_sidebar.md.meta
+docs/*.meta
