@@ -213,36 +213,80 @@ public class AutoLevelLine : MonoBehaviour{
         }
         #endif
     }
-
-    //creates multiple children to fill the width of the line
-    public void GenerateRepeated(LinePrefab linePrefab){
+public void GenerateRepeated(LinePrefab linePrefab)
+    {
         #if UNITY_EDITOR
 
-        //calculate the number of windows we can fit in the space
-        var windowWidth = linePrefab.width;
-        var rotationOffset = linePrefab.offsetRotation;
-        var windowCount = Mathf.FloorToInt(distance / windowWidth);
-        var remainingSpace = distance - (windowCount * windowWidth);
-        var offset = remainingSpace / windowCount;
-        
-        for(int i = 0; i < windowCount; i++){
-            var windowPosition = startPos + transform.forward * (windowWidth * i);
-            windowPosition += transform.forward * (windowWidth/1.5f);
-            windowPosition += transform.forward * (offset/2);
-            //windowPosition += transform.up * (prefabs.FloorHeight / 2);
-
-            GameObject window = PrefabUtility.InstantiatePrefab(linePrefab.prefab) as GameObject;
-            window.transform.position = windowPosition;
-            window.transform.rotation = Quaternion.LookRotation(direction);
-
-            //apply the offset rotation
-            window.transform.Rotate(linePrefab.offsetRotation, Space.Self);
-
-            window.transform.SetParent(transform);
-            window.transform.localScale = new Vector3(window.transform.localScale.x, window.transform.localScale.y, window.transform.localScale.z+offset);
-            window.transform.Rotate(rotationOffset, Space.Self);
+        // --- Basic Safety Checks ---
+        if (linePrefab.prefab == null)
+        {
+            Debug.LogError($"AutoLevelLine: Prefab for repetition is null in LinePrefab '{linePrefab.name}'.");
+            return;
+        }
+        // Use a small epsilon for float comparisons to avoid issues with tiny distances/widths
+        float epsilon = 0.001f; 
+        if (distance <= epsilon) 
+        {
+            return; // No space to fill
+        }
+        if (linePrefab.width <= epsilon)
+        {
+            Debug.LogError($"AutoLevelLine: linePrefab.width must be positive for repetition in LinePrefab '{linePrefab.name}'. Defaulting to stretching one item.");
+            // Fallback: stretch a single instance if width is invalid but distance is not.
+            // This reuses the GenerateStretch logic for a single item.
+            var tempStretchPrefab = new LinePrefab { // Create a temporary LinePrefab for GenerateStretch
+                name = linePrefab.name + " (Stretched Fallback)",
+                prefab = linePrefab.prefab,
+                alignment = PrefabAlignment.Stretch, // Ensure it uses stretch logic
+                width = (linePrefab.width <= epsilon && distance > epsilon) ? distance : linePrefab.width, // Use distance as width if original width is bad
+                offsetRotation = linePrefab.offsetRotation,
+                sidePrefabIndex = linePrefab.sidePrefabIndex 
+            };
+            GenerateStretch(tempStretchPrefab);
+            return;
         }
 
+        // 1. Determine the number of items needed
+        int itemCount = Mathf.RoundToInt(distance / linePrefab.width);
+        if (itemCount <= 0)
+        {
+            itemCount = 1; // Ensure at least one item if there's any distance to cover
+        }
+
+        // 2. Calculate the actual length each item must occupy along the line
+        float actualItemLength = distance / itemCount;
+
+        // 3. Calculate the scale factor for the X-axis.
+        // This assumes linePrefab.width is the prefab's natural length along its Z-axis when its localScale.z = 1.
+        float scaleFactorX = actualItemLength / linePrefab.width;
+
+        // Reference to the original prefab to get its asset's local scale for X and Y axes.
+        GameObject prefabAsset = linePrefab.prefab;
+        Vector3 prefabAssetLocalScale = prefabAsset.transform.localScale;
+
+        for (int i = 0; i < itemCount; i++)
+        {
+            // Calculate the center position for this item in world space
+            Vector3 itemWorldCenterPosition = startPos + transform.forward * (i * actualItemLength + actualItemLength / 2f);
+
+            GameObject item = PrefabUtility.InstantiatePrefab(prefabAsset) as GameObject;
+            if (item == null) continue; // Should not happen if prefabAsset is not null
+
+            // Set initial world position and rotation
+            item.transform.position = itemWorldCenterPosition;
+            item.transform.rotation = Quaternion.LookRotation(direction); // Align item's local Z-axis with the line direction
+
+            // Parent the item to this AutoLevelLine object.
+            // Using worldPositionStays = true ensures its world orientation is preserved before local adjustments.
+            item.transform.SetParent(transform, true); 
+
+            // Apply scaling:
+            // Preserve the prefab's original X and Y local scales, but set the Z local scale to our calculated factor.
+            item.transform.localScale = new Vector3(scaleFactorX, prefabAssetLocalScale.y, prefabAssetLocalScale.z);
+            
+            // Apply the offset rotation (local to the item, after scaling)
+            item.transform.Rotate(linePrefab.offsetRotation, Space.Self);
+        }
         #endif
     }
 
