@@ -246,15 +246,30 @@ public void GenerateRepeated(LinePrefab linePrefab)
             return;
         }
 
+        var distance_ = distance;
+        var fixed_margin = 0f;
+        //spawn the "caps" at the start and end of the line
+        if (linePrefab.sidePrefabIndex > 0 && linePrefab.sidePrefabIndex < prefabs.LinePrefabs.Count)
+        {
+            var sidePrefab = prefabs.LinePrefabs[linePrefab.sidePrefabIndex];
+            fixed_margin = 1.2f;
+            if (sidePrefab.prefab != null)
+            {
+                CreateAndStretch(sidePrefab, startPos, startPos + (transform.forward * fixed_margin));
+                CreateAndStretch(sidePrefab, endPos, endPos - (transform.forward * fixed_margin));
+                distance_ -= fixed_margin * 2; // Adjust distance to account for the caps
+            }
+        }
+
         // 1. Determine the number of items needed
-        int itemCount = Mathf.RoundToInt(distance / linePrefab.width);
+        int itemCount = Mathf.RoundToInt(distance_ / linePrefab.width);
         if (itemCount <= 0)
         {
             itemCount = 1; // Ensure at least one item if there's any distance to cover
         }
 
         // 2. Calculate the actual length each item must occupy along the line
-        float actualItemLength = distance / itemCount;
+        float actualItemLength = distance_ / itemCount;
 
         // 3. Calculate the scale factor for the X-axis.
         // This assumes linePrefab.width is the prefab's natural length along its Z-axis when its localScale.z = 1.
@@ -267,7 +282,7 @@ public void GenerateRepeated(LinePrefab linePrefab)
         for (int i = 0; i < itemCount; i++)
         {
             // Calculate the center position for this item in world space
-            Vector3 itemWorldCenterPosition = startPos + transform.forward * (i * actualItemLength + actualItemLength / 2f);
+            Vector3 itemWorldCenterPosition = startPos + transform.forward * ((i * actualItemLength + actualItemLength / 2f) + fixed_margin);
 
             GameObject item = PrefabUtility.InstantiatePrefab(prefabAsset) as GameObject;
             if (item == null) continue; // Should not happen if prefabAsset is not null
